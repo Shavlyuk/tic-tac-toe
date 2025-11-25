@@ -2,6 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from .models import Base
 
+# TODO: КРИТИЧЕСКИ ВАЖНО - Переместить в конфигурационный файл
+# Hardcoded значения затрудняют деплой и тестирование
+# См. REVIEW.md секцию "TODO: Отсутствие конфигурационного файла"
 SQLALCHEMY_DATABASE_URL = "sqlite:///./tictactoe.db"
 
 engine = create_engine(

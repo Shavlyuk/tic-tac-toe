@@ -27,6 +27,8 @@ def game_db_to_state(game_db: Game) -> dict:
 @router.post("/games", response_model=GameState, summary="Create new game")
 def create_game(game_data: GameCreate, db: Session = Depends(get_db)):
     """Create a new Tic-Tac-Toe game"""
+    # TODO: Заменить print() на logging.logger
+    # См. REVIEW.md секцию "TODO: Избыточное логирование print()"
     print("🎮 Creating new game for player:", game_data.player_name)
     try:
         db_game = game_crud.create_game(db, game_data)
@@ -34,6 +36,9 @@ def create_game(game_data: GameCreate, db: Session = Depends(get_db)):
         print("✅ Game created successfully:", result["id"])
         return result
     except Exception as e:
+        # TODO: КРИТИЧЕСКИ ВАЖНО - Улучшить обработку ошибок
+        # Общий except Exception скрывает реальные проблемы
+        # См. REVIEW.md секцию "TODO: Отсутствие обработки ошибок базы данных"
         print("❌ Error creating game:", str(e))
         raise HTTPException(status_code=500, detail="Internal server error")
 
@@ -109,6 +114,10 @@ def make_move(game_id: str, move_data: Move, db: Session = Depends(get_db)):
     if not db_game:
         print("❌ GAME NOT FOUND")
         raise HTTPException(status_code=404, detail="Game not found")
+    
+    # TODO: КРИТИЧЕСКИ ВАЖНО - Добавить проверку присоединения второго игрока
+    # Сейчас игрок O может сделать ход до того как присоединится к игре
+    # См. REVIEW.md секцию "TODO: Отсутствие валидации существования второго игрока"
 
     print(f"📊 GAME STATE - Player X: {db_game.player_x}, Player O: {db_game.player_o}")
     print(f"📊 GAME STATE - Current player: {db_game.current_player}, Requested player: {move_data.player}")
