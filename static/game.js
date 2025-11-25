@@ -1,6 +1,6 @@
 console.log('🎮 game.js loaded!');
 
-const API_BASE = 'http://localhost:8000/api/v1';
+const API_BASE = window.location.origin + '/api/v1';
 
 let currentGameId = null;
 let playerName = null;
@@ -284,7 +284,7 @@ function updateGameState(game) {
 function updatePlayersInfo(players, currentPlayerTurn) {
     console.log('👥 Updating players info:', players);
 
-    const isMyTurn = currentPlayerTurn === currentPlayer;
+    const isMyTurn = currentPlayerTurn === myPlayerSymbol;
 
     playerXElement.textContent = `X: ${players.X || 'Ожидание...'}`;
     playerOElement.textContent = `O: ${players.O || 'Ожидание...'}`;

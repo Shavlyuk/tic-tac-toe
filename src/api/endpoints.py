@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from datetime import datetime
+from sqlalchemy.exc import SQLAlchemyError
+import logging
 
 from src.db.database import get_db
 from src.db.models import Game
@@ -9,7 +11,7 @@ from src.crud import game_crud
 from src.core.game_logic import check_winner, is_board_full
 
 router = APIRouter()
-
+logger = logging.getLogger(__name__)
 
 def game_db_to_state(game_db: Game) -> dict:
     """Конвертирует SQLAlchemy модель в словарь для Pydantic"""
@@ -27,14 +29,14 @@ def game_db_to_state(game_db: Game) -> dict:
 @router.post("/games", response_model=GameState, summary="Create new game")
 def create_game(game_data: GameCreate, db: Session = Depends(get_db)):
     """Create a new Tic-Tac-Toe game"""
-    print("🎮 Creating new game for player:", game_data.player_name)
     try:
         db_game = game_crud.create_game(db, game_data)
-        result = game_db_to_state(db_game)
-        print("✅ Game created successfully:", result["id"])
-        return result
+        return game_db_to_state(db_game)
+    except SQLAlchemyError as e:
+        logger.error(f"Database error creating game: {e}")
+        raise HTTPException(status_code=500, detail="Database error")
     except Exception as e:
-        print("❌ Error creating game:", str(e))
+        logger.error(f"Unexpected error creating game: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -112,6 +114,12 @@ def make_move(game_id: str, move_data: Move, db: Session = Depends(get_db)):
 
     print(f"📊 GAME STATE - Player X: {db_game.player_x}, Player O: {db_game.player_o}")
     print(f"📊 GAME STATE - Current player: {db_game.current_player}, Requested player: {move_data.player}")
+
+    if not db_game.player_o:
+        raise HTTPException(
+            status_code=400,
+            detail="Waiting for second player to join"
+        )
 
     # Game validation
     if db_game.winner or db_game.is_draw:
