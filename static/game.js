@@ -295,14 +295,14 @@ function updatePlayersInfo(players, currentPlayerTurn) {
 
     if (currentPlayerTurn === 'X') {
         playerXElement.classList.add('current');
-        if (isMyTurn && currentPlayer === 'X') {
+        if (isMyTurn && myPlayerSymbol === 'X') {
             playerXElement.classList.add('your-turn');
         } else {
             playerXElement.classList.add('waiting-turn');
         }
     } else if (currentPlayerTurn === 'O') {
         playerOElement.classList.add('current');
-        if (isMyTurn && currentPlayer === 'O') {
+        if (isMyTurn && myPlayerSymbol === 'O') {
             playerOElement.classList.add('your-turn');
         } else {
             playerOElement.classList.add('waiting-turn');
@@ -433,7 +433,7 @@ function resetGame() {
     }
 
     currentGameId = null;
-    currentPlayer = null;
+    myPlayerSymbol = null;
     playerName = null;
 
     if (pollInterval) {
