@@ -56,6 +56,13 @@ def test_make_move(test_db):
     create_response = client.post("/api/v1/games", json={"player_name": "Player1"})
     game_id = create_response.json()["id"]
 
+    # Join second player
+    join_response = client.post(
+        f"/api/v1/games/{game_id}/join",
+        json={"player_name": "Player2"}
+    )
+    assert join_response.status_code == 200
+
     move_response = client.post(
         f"/api/v1/games/{game_id}/move",
         json={"player": "X", "row": 0, "col": 0}
